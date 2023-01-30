@@ -6,15 +6,15 @@ from zipline.api import(    symbol,
                             time_rules,
                             get_datetime
                          )
-import talib as ta
+#Technical Analysis library of Python
+import talib as ta  
 
 def initialize(context):
 
-    context.stock = [ symbol('ASIANPAINT')]
-    
-    context.length_small_sma = 20
-    context.length_long_sma = 50
+    #Stock which we want to buy ans sell acoording to Hand ans Shoulder Pattern
+    context.stock = [ symbol('ASIANPAINT')]     
 
+    #It will run at the 15min intervals after the markets open ie 9:15 to 3:15
     for i in range (1,390,15):
         schedule_function(
                     run_strategy,
@@ -24,12 +24,14 @@ def initialize(context):
     
 def run_strategy(context,data):
     
-    stock_data = data.history(context.stock, ['close'], 900,"1m" )
+    #Collecting past history of the Stocks
+    stock_data = data.history(context.stock, ["close"], 900,"1m" )
     for stock in context.stock:
         stock_data["close"][stock] = (stock_data["close"][stock]).resample("15T", label="right", closed="right").last()
 
     stock_data["close"].dropna(inplace=True)
 
+    #Finding Head nd Shoulder
     for stock in context.stock:
         head_and_shoulders = ta.CDLHEADANDSHOULDERS(stock)
         
